@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>لعبة الأصوات</title>
+  <link rel="stylesheet" href="styles/styles.css" />
+  
+  <style>
+    body {
+      font-family: Arial;
+      background-color: #e6f7ff;
+      text-align: center;
+      padding: 40px;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    .animal {
+      display: inline-block;
+      margin: 20px;
+    }
+
+    .animal img {
+      width: 150px;
+      height: 150px;
+      cursor: pointer;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .back-btn {
+      margin-top: 40px;
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border-radius: 6px;
+      text-decoration: none;
+    }
+
+    .back-btn:hover {
+      background-color: #0056b3;
+    }
+  
+
+  </style>
+</head>
+<body>
+
+  <h2>🔊 اضغط على الحيوان لتسمع صوته</h2>
+
+  <div class="animal">
+    <img src="images/cow.jpg" alt="بقرة" onclick="playSound('cow')">
+  </div>
+
+  <div class="animal">
+    <img src="images/cat.jpg" alt="قطة" onclick="playSound('cat')">
+  </div>
+
+  <div class="animal">
+    <img src="images/dog.jpg" alt="كلب" onclick="playSound('dog')">
+  </div>
+  <div class="animal">
+    <img src="images/bird.jpg" alt="عصفور" onclick="playSound('bird')">
+  </div>
+
+  <audio id="sound"></audio>
+
+  <div>
+    <a href="games.html" class="back-btn">🔙 رجوع</a>
+  </div>
+
+  <script>
+    function playSound(animal) {
+      const sound = document.getElementById('sound');
+      sound.src = 'sounds/' + animal + '.mp3';
+      sound.play();
+    }
+  </script>
+
+</body>
+</html>
+

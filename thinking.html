@@ -1,0 +1,427 @@
+
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <title>مهارات التفكير والألعاب</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      --card-bg:#fff;
+      --accent:#0288d1;
+      --ok:#2e7d32;
+      --warn:#f57c00;
+    }
+    body{
+      margin:0;
+      font-family: "Arial",sans-serif;
+      background: linear-gradient(180deg,#f0f9ff 0%, #ffffff 60%);
+      color:#111;
+      padding:18px;
+    }
+    header{ text-align:center; background:var(--accent); color:#fff; padding:16px 10px; border-radius:10px; font-size:20px; margin-bottom:16px;}
+    .container{ max-width:1000px; margin:0 auto; }
+    h2{ color:var(--accent); margin:0 0 8px 0; }
+    .section{ background:var(--card-bg); border-radius:12px; padding:14px; box-shadow:0 6px 18px rgba(2,40,60,0.06); margin-bottom:18px; }
+    .hint{ font-size:14px; color:#444; margin-bottom:8px; }
+    /* ===== فرز العناصر ===== */
+    .bins{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:12px;}
+    .bin{
+      width:140px; height:110px; border-radius:10px; background:#f7fbff;
+      display:flex; align-items:center; justify-content:center; flex-direction:column;
+      border:3px dashed #cfe9fb; cursor:pointer; transition:transform .12s;
+    }
+    .bin.active{ transform:scale(1.04); border-color:var(--accent); box-shadow:0 8px 18px rgba(2,136,209,0.12); }
+    .items{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:12px; }
+    .item{
+      background:#fff; border-radius:10px; width:84px; height:84px; display:flex; align-items:center; justify-content:center;
+      box-shadow:0 6px 12px rgba(0,0,0,0.06); font-size:34px; cursor:pointer; user-select:none; transition:transform .12s;
+    }
+    .item.selected{ transform:scale(1.06); box-shadow:0 10px 20px rgba(0,0,0,0.12); outline:3px solid rgba(2,136,209,0.12); }
+    .status{ text-align:center; margin-top:10px; font-weight:700; color:var(--ok); }
+
+    /* ===== لعبة الذاكرة ===== */
+    .grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:12px; }
+    .card{
+      background:linear-gradient(180deg,#fff,#f8fbff); border-radius:8px; height:80px; display:flex; align-items:center; justify-content:center;
+      font-size:30px; cursor:pointer; box-shadow:0 6px 12px rgba(0,0,0,0.06); user-select:none; position:relative;
+    }
+    .card.flipped{ background:#fff; transform:rotateY(0); }
+    .card.matched{ background:linear-gradient(90deg,#e8f7ef,#f0fff5); border:2px solid var(--ok); transform:scale(1.02);}
+    .controls{ display:flex; gap:8px; justify-content:center; margin-top:12px; }
+
+    /* ===== ترتيب الخطوات ===== */
+    .steps{ display:flex; gap:10px; flex-direction:column; max-width:500px; margin:12px auto; }
+    .step{
+      background:#fff; padding:12px; border-radius:8px; display:flex; align-items:center; justify-content:space-between;
+      box-shadow:0 6px 12px rgba(0,0,0,0.06); cursor:grab; user-select:none;
+    }
+    .step.dragging{ opacity:0.6; transform:scale(0.98); }
+    .ok-msg{ text-align:center; font-weight:700; color:var(--ok); margin-top:10px; }
+
+    /* responsive */
+    @media (max-width:640px){
+      .bin{ width:45%; height:100px; }
+      .item{ width:64px; height:64px; font-size:26px;}
+      .grid{ grid-template-columns:repeat(2,1fr); }
+    }
+  
+.back-button {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.back-button a {
+  background-color: #00bcd4;
+  color: white;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+  </style>
+</head>
+<body>
+  <header>🧠 مهارات التفكير واللعب</header>
+
+  <div class="container">
+
+    <!-- قسم 1: فرز العناصر -->
+    <section class="section" id="sortSection">
+      <h2>فرز العناصر</h2>
+      <div class="hint">انقري على عنصر (مربع) ثم انقري على السلة المناسبة لتضع العنصر فيها.</div>
+
+      <div style="text-align:center;font-size:15px;color:#444">اختر العنصر ثم السلة — مثلاً ضع الفاكهة في سلة الفواكه</div>
+
+      <div class="items" id="itemsArea" aria-live="polite">
+        <!-- العناصر تولد من JavaScript -->
+      </div>
+
+      <div class="bins" id="binsArea" aria-hidden="false">
+        <!-- السلات -->
+        <div class="bin" data-kind="fruit">
+          <div style="font-size:20px">سلة الفاكهة</div>
+          <div style="font-size:28px">🍎🍌</div>
+        </div>
+        <div class="bin" data-kind="toy">
+          <div style="font-size:20px">سلة الألعاب</div>
+          <div style="font-size:28px">🧸🔴</div>
+        </div>
+        <div class="bin" data-kind="utensil">
+          <div style="font-size:20px">سلة أدوات</div>
+          <div style="font-size:28px">🍴🥣</div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:12px;">
+        <button onclick="resetSort()" style="padding:8px 14px;border-radius:8px;background:var(--accent);color:#fff;border:none;cursor:pointer">إعادة تمرين الفرز</button>
+      </div>
+      <div class="status" id="sortStatus" aria-live="polite"></div>
+    </section>
+
+    <!-- قسم 2: لعبة الذاكرة -->
+    <section class="section" id="memorySection">
+      <h2>لعبة الذاكرة (مطابقة البطاقات)</h2>
+      <div class="hint">انقري على بطاقتين لمحاولة مطابقة رمز واحد.</div>
+
+      <div class="grid" id="memoryGrid" aria-live="polite">
+        <!-- بطاقات تولد بالـ JS -->
+      </div>
+
+      <div class="controls">
+        <button onclick="startMemory()" style="padding:8px 12px;border-radius:8px;border:none;background:#2e7d32;color:#fff;cursor:pointer">إعادة خلط</button>
+        <button onclick="showAll()" style="padding:8px 12px;border-radius:8px;border:none;background:#f57c00;color:#fff;cursor:pointer">إظهار مؤقت</button>
+      </div>
+      <div class="status" id="memoryStatus" aria-live="polite" style="margin-top:8px;font-weight:700"></div>
+    </section>
+
+    <!-- قسم 3: ترتيب الخطوات -->
+    <section class="section" id="sequenceSection">
+      <h2>ترتيب الخطوات</h2>
+      <div class="hint">رتّبي الخطوات بالترتيب الصحيح لسلوك يومي (اسحب أو استخدم الأزرار).</div>
+
+      <div style="text-align:center;font-size:15px;color:#444; margin-bottom:8px">اسحب العناصر لترتيبها، ثم اضغط تحقق.</div>
+
+      <div class="steps" id="stepsList" aria-live="polite">
+        <!-- خطوات تولد بالـ JS -->
+      </div>
+
+      <div style="text-align:center;margin-top:12px;">
+        <button onclick="checkSequence()" style="padding:8px 12px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer">تحقق الترتيب</button>
+        <button onclick="shuffleSteps()" style="padding:8px 12px;border-radius:8px;border:none;background:#777;color:#fff;margin-inline-start:8px;cursor:pointer">خلط</button>
+      </div>
+      <div class="ok-msg" id="seqStatus" aria-live="polite"></div>
+    </section>
+
+  </div>
+
+  <script>
+    /***********************
+     *  فرز العناصر (اختيار ثم وضع)
+     ***********************/
+    const itemsDef = [
+      {id:'i1', label:'🍎 تفاحة', kind:'fruit'},
+      {id:'i2', label:'🍌 موز', kind:'fruit'},
+      {id:'i3', label:'🧸 دب', kind:'toy'},
+      {id:'i4', label:'🔴 كرة', kind:'toy'},
+      {id:'i5', label:'🍴 شوكة', kind:'utensil'},
+      {id:'i6', label:'🥣 وعاء', kind:'utensil'}
+    ];
+    let selectedItemId = null;
+    let scoreSort = 0;
+
+    function renderItems(){
+      const area = document.getElementById('itemsArea');
+      area.innerHTML = '';
+      // خلط العناصر عشوائيا
+      const arr = itemsDef.slice().sort(()=>Math.random()-0.5);
+      arr.forEach(it=>{
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.id = it.id;
+        div.tabIndex = 0;
+        div.setAttribute('data-kind', it.kind);
+        div.innerHTML = '<div style="text-align:center">'+ it.label +'</div>';
+        div.onclick = ()=> selectItem(it.id);
+        area.appendChild(div);
+      });
+      document.getElementById('sortStatus').textContent = '';
+    }
+
+    function selectItem(id){
+      // إلغاء التحديد السابق
+      document.querySelectorAll('.item').forEach(el => el.classList.remove('selected'));
+      if(selectedItemId === id){
+        selectedItemId = null;
+        return;
+      }
+      selectedItemId = id;
+      const el = document.getElementById(id);
+      if(el) el.classList.add('selected');
+    }
+
+    // اضبط السلات
+    document.querySelectorAll('.bin').forEach(bin=>{
+      bin.addEventListener('click', ()=>{
+        // وضع العنصر المحدد
+        if(!selectedItemId){
+          flashStatus('اختر العنصر أولًا ثم اضغط السلة المناسبة', 'warn');
+          return;
+        }
+        const item = document.getElementById(selectedItemId);
+        const itemKind = item.getAttribute('data-kind');
+        const binKind = bin.getAttribute('data-kind');
+        if(itemKind === binKind){
+          // نجاح
+          item.style.visibility = 'hidden';
+          item.classList.remove('selected');
+          selectedItemId = null;
+          scoreSort++;
+          flashStatus('ممتاز! تم وضع العنصر في المكان الصحيح', 'ok');
+          if(scoreSort === itemsDef.length){
+            flashStatus('تهانينا! أنهيت تمرين الفرز ✅', 'ok');
+          }
+        } else {
+          flashStatus('ليس هذا المكان الصحيح، جرّب مرة أخرى', 'warn');
+          // اهتزاز بصري بسيط
+          bin.classList.add('active');
+          setTimeout(()=> bin.classList.remove('active'), 400);
+        }
+      });
+      bin.addEventListener('mouseenter', ()=> bin.classList.add('active'));
+      bin.addEventListener('mouseleave', ()=> bin.classList.remove('active'));
+    });
+
+    function resetSort(){
+      scoreSort = 0;
+      selectedItemId = null;
+      renderItems();
+    }
+
+    function flashStatus(text, type){
+      const el = document.getElementById('sortStatus');
+      el.textContent = text;
+      if(type === 'warn'){
+        el.style.color = 'var(--warn)';
+      } else {
+        el.style.color = 'var(--ok)';
+      }
+      // يختفي بعد 3 ثواني
+      setTimeout(()=>{ if(document.getElementById('sortStatus')) document.getElementById('sortStatus').textContent=''; }, 3000);
+    }
+
+    /***********************
+     *  لعبة الذاكرة (مطابقة البطاقات)
+     ***********************/
+    const pairs = ['🐶','🐱','🐮','🐷','🐸','🐵']; // رموز مريحة
+    let memoryState = { first:null, lock:false, matched:0 };
+
+    function startMemory(){
+      memoryState = { first:null, lock:false, matched:0 };
+      const grid = document.getElementById('memoryGrid');
+      grid.innerHTML = '';
+      // جهز مصفوفة من الرموز مكررة ثم خلط
+      const cards = pairs.concat(pairs).sort(()=>Math.random()-0.5);
+      cards.forEach((sym, idx)=>{
+        const c = document.createElement('div');
+        c.className = 'card';
+        c.setAttribute('data-sym', sym);
+        c.tabIndex = 0;
+        c.innerHTML = '<div class="face">❓</div>';
+        c.onclick = ()=> flipCard(c);
+        grid.appendChild(c);
+      });
+      document.getElementById('memoryStatus').textContent = '';
+    }
+
+    function flipCard(card){
+      if(memoryState.lock) return;
+      if(card.classList.contains('matched') || card.classList.contains('flipped')) return;
+      card.classList.add('flipped');
+      card.textContent = card.getAttribute('data-sym');
+      if(!memoryState.first){
+        memoryState.first = card;
+        return;
+      }
+      // تحقق
+      if(memoryState.first.getAttribute('data-sym') === card.getAttribute('data-sym')){
+        memoryState.first.classList.add('matched');
+        card.classList.add('matched');
+        memoryState.matched += 2;
+        memoryState.first = null;
+        document.getElementById('memoryStatus').textContent = 'مبارك! زوج مطابق';
+        if(memoryState.matched === pairs.length*2){
+          document.getElementById('memoryStatus').textContent = 'رائع! أنهيت اللعبة 🎉';
+        }
+      } else {
+        memoryState.lock = true;
+        document.getElementById('memoryStatus').textContent = 'حاول مرة أخرى';
+        setTimeout(()=>{
+          memoryState.first.classList.remove('flipped');
+          memoryState.first.textContent = '❓';
+          card.classList.remove('flipped');
+          card.textContent = '❓';
+          memoryState.lock = false;
+          memoryState.first = null;
+          document.getElementById('memoryStatus').textContent = '';
+        }, 900);
+      }
+    }
+
+    function showAll(){
+      // يكشف البطاقات لثانية ثم يخفي
+      const cards = Array.from(document.querySelectorAll('#memoryGrid .card'));
+      cards.forEach(c=> { c.classList.add('flipped'); c.textContent = c.getAttribute('data-sym'); });
+      setTimeout(()=> {
+        cards.forEach(c=> { if(!c.classList.contains('matched')) { c.classList.remove('flipped'); c.textContent = '❓'; } });
+      }, 1100);
+    }
+
+    /***********************
+     *  ترتيب الخطوات (سحب أو ضغط)
+     ***********************/
+    const correctSequence = [
+      {id:'s1', text:'غسل اليدين 🧼'},
+      {id:'s2', text:'تناول الطعام 🍽️'},
+      {id:'s3', text:'ترتيب اللعب 🧸'}
+    ];
+    let currentOrder = [];
+
+    function renderSteps(){
+      const list = document.getElementById('stepsList');
+      list.innerHTML = '';
+      // خلط المصفوفة لعرض عشوائي
+      currentOrder = correctSequence.slice().sort(()=>Math.random()-0.5);
+      currentOrder.forEach(item=>{
+        const el = document.createElement('div');
+        el.className = 'step';
+        el.id = item.id;
+        el.draggable = true;
+        el.innerHTML = `<div>${item.text}</div><div style="opacity:0.6">⬍</div>`;
+        // سحب واسقاط
+        el.addEventListener('dragstart', e=> {
+          el.classList.add('dragging');
+          e.dataTransfer.setData('text/plain', item.id);
+        });
+        el.addEventListener('dragend', ()=> el.classList.remove('dragging'));
+        list.appendChild(el);
+      });
+      // دعم استقبال السقط على العناصر لعمل تبديل
+      enableDragSwap();
+      document.getElementById('seqStatus').textContent = '';
+    }
+
+    function enableDragSwap(){
+      const list = document.getElementById('stepsList');
+      list.querySelectorAll('.step').forEach(step=>{
+        step.addEventListener('dragover', e=> e.preventDefault());
+        step.addEventListener('drop', e=>{
+          e.preventDefault();
+          const draggedId = e.dataTransfer.getData('text/plain');
+          if(!draggedId) return;
+          const draggedEl = document.getElementById(draggedId);
+          const targetEl = e.currentTarget;
+          // تبديل العناصر بمكانها DOM
+          const after = (draggedEl.compareDocumentPosition(targetEl) & Node.DOCUMENT_POSITION_FOLLOWING) ? targetEl.nextSibling : targetEl;
+          list.insertBefore(draggedEl, after);
+        });
+      });
+    }
+
+    function shuffleSteps(){
+      renderSteps();
+    }
+
+    function checkSequence(){
+      // جمع الترتيب الحالي
+      const ids = Array.from(document.querySelectorAll('#stepsList .step')).map(e=> e.id);
+      const ok = ids.every((id, idx) => id === correctSequence[idx].id);
+      const msgEl = document.getElementById('seqStatus');
+      if(ok){
+        msgEl.style.color = 'var(--ok)';
+        msgEl.textContent = 'ممتاز! الترتيب صحيح ✅';
+      } else {
+        msgEl.style.color = '#c62828';
+        msgEl.textContent = 'ليس صحيحًا بعد. جرّب ترتيب العناصر مرة أخرى.';
+      }
+      // يختفي بعد 3 ثواني
+      setTimeout(()=> msgEl.textContent = '', 3000);
+    }
+
+    // تهيئة الصفحة عند التحميل
+    window.addEventListener('DOMContentLoaded', ()=>{
+      renderItems();
+      startMemory();
+      renderSteps();
+
+      // تمكين وضع النقر كبديل للسحب: النقر على خطوة يحددها ثم النقر على أخرى لتبديلها
+      let firstStep = null;
+      document.getElementById('stepsList').addEventListener('click', (e)=>{
+        const step = e.target.closest('.step');
+        if(!step) return;
+        if(!firstStep){
+          firstStep = step;
+          step.style.outline = '3px dashed rgba(2,136,209,0.2)';
+        } else if(firstStep === step){
+          firstStep.style.outline = 'none'; firstStep = null;
+        } else {
+          // تبديل الـ DOM
+          const list = document.getElementById('stepsList');
+          const ref = (firstStep.compareDocumentPosition(step) & Node.DOCUMENT_POSITION_FOLLOWING) ? step.nextSibling : step;
+          list.insertBefore(firstStep, ref);
+          firstStep.style.outline = 'none';
+          firstStep = null;
+        }
+      });
+    });
+  </script>
+  
+<div class="back-button">
+  <a href="skills.html">⬅️ رجوع إلى صفحة المهارات</a>
+</div>
+
+</body>
+</html>
+

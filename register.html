@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>إنشاء حساب</title>
+   <link rel="stylesheet" href="styles/styles.css" />
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #fff3e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .register-box {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      width: 350px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #fb8c00;
+      margin-bottom: 1.5rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.6rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      direction: rtl;
+    }
+
+    input[type="submit"] {
+      background-color: #fb8c00;
+      color: white;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #ef6c00;
+    }
+
+    .link {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .link a {
+      color: #ef6c00;
+      text-decoration: none;
+    }
+
+    .link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="register-box">
+    <h2>إنشاء حساب جديد</h2>
+    <form action="register.php" method="POST">
+      <input type="text" name="parent_name" placeholder="اسم ولي الأمر" required>
+      <input type="text" name="child_name" placeholder="اسم الطفل" required>
+      <input type="number" name="child_age" placeholder="عمر الطفل" min="1" max="18" required>
+      <input type="email" name="email" placeholder="البريد الإلكتروني" required>
+      <input type="password" name="password" placeholder="كلمة المرور" required>
+      <input type="submit" value="إنشاء الحساب">
+    </form>
+    <div class="link">
+      لديك حساب؟ <a href="login.html">سجّل الدخول</a>
+    </div>
+  </div>
+
+</body>
+</html>
+

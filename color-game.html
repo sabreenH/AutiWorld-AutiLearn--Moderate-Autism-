@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>تلوين المنظر الطبيعي</title>
+   <link rel="stylesheet" href="styles/styles.css" />
+  <style>
+    body { font-family: Arial; background:#e8f7ff; margin:0; padding:20px; text-align:center; }
+    h2 { color:#0275d8; }
+    #scene { width: 700px; max-width:95%; margin: 20px auto; background:#cfeefd; padding:10px; border-radius:10px; }
+    .palette { margin-top:12px; }
+    .color-btn { display:inline-block; width:36px; height:36px; border-radius:50%; margin:6px; border:2px solid #fff; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
+    .color-btn.selected { outline:3px solid #333; }
+    .hint { margin-top:10px; color:#333; }
+    .back { margin-top:18px; }
+    .back a { text-decoration:none; color:#007bff; }
+  </style>
+</head>
+<body>
+  <h2>🎨 لون المنظر الطبيعي (انقر لاختيار اللون ثم انقر على العنصر)</h2>
+
+  <div id="scene">
+    <!-- SVG منظر بسيط: بيت + سقف + شجرة + شمس + حيوان -->
+    <svg viewBox="0 0 700 350" width="100%" height="350" xmlns="http://www.w3.org/2000/svg" id="svgScene">
+      <!-- السماء (خلفية) -->
+      <rect x="0" y="0" width="700" height="200" fill="#cceeff"></rect>
+
+      <!-- شمس (id=sun) -->
+      <circle id="sun" cx="600" cy="60" r="35" fill="#ffd54f" stroke="#f9a825" stroke-width="2" style="cursor:pointer"></circle>
+
+      <!-- أرض -->
+      <rect x="0" y="200" width="700" height="150" fill="#98ee99"></rect>
+
+      <!-- بيت (body) -->
+      <rect id="house-body" x="120" y="120" width="140" height="110" fill="#ffffff" stroke="#8d6e63" stroke-width="2" style="cursor:pointer"></rect>
+      <!-- سقف -->
+      <polygon id="house-roof" points="120,120 190,70 260,120" fill="#a52a2a" stroke="#7b1e1e" stroke-width="2" style="cursor:pointer"></polygon>
+      <!-- باب -->
+      <rect id="door" x="170" y="170" width="40" height="60" fill="#6d4c41" style="cursor:pointer"></rect>
+
+      <!-- شجرة -->
+      <rect id="trunk" x="420" y="150" width="20" height="80" fill="#8d6e63" style="cursor:pointer"></rect>
+      <circle id="leaves" cx="430" cy="130" r="45" fill="#2e7d32" style="cursor:pointer"></circle>
+
+      <!-- حيوان (شكل بيضاوي بسيط) -->
+      <ellipse id="animal" cx="340" cy="260" rx="30" ry="20" fill="#ffb6c1" style="cursor:pointer"></ellipse>
+      <circle id="animal-head" cx="365" cy="245" r="12" fill="#ffb6c1" style="cursor:pointer"></circle>
+    </svg>
+  </div>
+
+  <!-- لوحة الألوان -->
+  <div class="palette" id="palette">
+    <span class="color-btn" style="background:red;" data-color="red"></span>
+    <span class="color-btn" style="background:orange;" data-color="orange"></span>
+    <span class="color-btn" style="background:yellow;" data-color="yellow"></span>
+    <span class="color-btn" style="background:green;" data-color="green"></span>
+    <span class="color-btn" style="background:blue;" data-color="blue"></span>
+    <span class="color-btn" style="background:purple;" data-color="purple"></span>
+    <span class="color-btn" style="background:brown;" data-color="brown"></span>
+    <span class="color-btn" style="background:#ffffff; border:2px solid #ccc;" data-color="#ffffff"></span>
+  </div>
+
+  <div class="hint" id="hint">اللون المختار: <span id="selectedColorName">أحمر</span></div>
+
+  <div class="back">
+    <a href="games.html">🔙 رجوع</a>
+  </div>
+
+  <script>
+    // اختيار اللون
+    let selectedColor = 'red';
+    const paletteButtons = document.querySelectorAll('.color-btn');
+    const selectedColorName = document.getElementById('selectedColorName');
+
+    function setSelected(btn) {
+      paletteButtons.forEach(b=> b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedColor = btn.getAttribute('data-color');
+      selectedColorName.textContent = selectedColor;
+    }
+
+    // اجعل أول زر محدد
+    if(paletteButtons.length) setSelected(paletteButtons[0]);
+
+    paletteButtons.forEach(btn=>{
+      btn.addEventListener('click', ()=> setSelected(btn));
+    });
+
+    // تلوين العناصر عند النقر
+    const svg = document.getElementById('svgScene');
+    svg.addEventListener('click', function(e){
+      // تحقق أن العنصر لديه id ونريد تلوينه
+      const target = e.target;
+      // فقط لعناصر معينة (تجنب الخلفية)
+      const paintable = ['sun','house-body','house-roof','door','trunk','leaves','animal','animal-head'];
+      if(target && target.id && paintable.includes(target.id)) {
+        if(target.tagName === 'polygon' || target.tagName === 'rect' || target.tagName === 'circle' || target.tagName === 'ellipse' || target.tagName === 'path') {
+          // بعض العناصر تحتاج تغيير fill أو stroke (سقف polygon استخدم fill)
+          target.setAttribute('fill', selectedColor);
+          // لو السقف كان مرسوم عن طريق border-bottom color في CSS فلن ينطبق هنا، لكن هذه عناصر SVG فالأمر سهل.
+        }
+      }
+    });
+  </script>
+</body>
+</html>
